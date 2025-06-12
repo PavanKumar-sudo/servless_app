@@ -1,7 +1,9 @@
 import os
 import boto3
 
+
 table = boto3.resource('dynamodb').Table(os.environ['TABLE_NAME'])
+
 
 def lambda_handler(event, context):
     code = event['pathParameters']['code']
@@ -10,7 +12,7 @@ def lambda_handler(event, context):
     if 'Item' in response:
         return {
             "statusCode": 302,
-            "headers": { "Location": response['Item']['url'] }
+            "headers": {"Location": response['Item']['url']}
         }
     else:
         return {
