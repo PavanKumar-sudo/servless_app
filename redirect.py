@@ -1,6 +1,7 @@
 import os
 import boto3
 
+
 def lambda_handler(event, context):
     table = boto3.resource('dynamodb').Table(os.environ['TABLE_NAME'])
 
