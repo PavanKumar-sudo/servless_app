@@ -1,11 +1,9 @@
 import os
 import boto3
 
-
-table = boto3.resource('dynamodb').Table(os.environ['TABLE_NAME'])
-
-
 def lambda_handler(event, context):
+    table = boto3.resource('dynamodb').Table(os.environ['TABLE_NAME'])
+
     code = event['pathParameters']['code']
     response = table.get_item(Key={'code': code})
 
