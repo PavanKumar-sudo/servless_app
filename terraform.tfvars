@@ -1,0 +1,7 @@
+table_name                     = "url-shortener-table"
+lambda_runtime                 = "python3.12"
+create_lambda_function_name    = "createLink"
+redirect_lambda_function_name  = "redirect"
+api_gateway_name               = "url-shortener-api"
+lambda_exec_role_name          = "url_shortener_lambda_exec"
+aws_region                    = "us-east-1"
