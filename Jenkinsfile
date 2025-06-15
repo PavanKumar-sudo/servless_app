@@ -55,17 +55,18 @@ pipeline {
       }
     }
 
-    stage('Integration Test') {
-      steps {
-        script {
-          def apiUrl = sh(script: "terraform output -raw api_url", returnStdout: true).trim()
-          sh """
-            curl -X POST "${apiUrl}/shorten" \
-              -H "Content-Type: application/json" \
-              -d '{"url": "https://example.com"}'
-          """
-        }
-      }
+   stage('Integration Test') {
+  steps {
+    script {
+      def apiUrl = sh(script: "terraform output -raw api_url", returnStdout: true).trim()
+      sh """
+        curl -X POST "${apiUrl}/shorten" \\
+          -H "Content-Type: application/json" \\
+          -d '{\"url\": \"https://example.com\"}'
+      """
     }
+  }
+}
+
   }
 }
