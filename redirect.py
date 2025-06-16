@@ -4,9 +4,10 @@ import boto3
 
 logger = Logger()
 
+
 @logger.inject_lambda_context
 def lambda_handler(event, context):
-    # ✅ Force 5xx simulation — only for testing
+    #  Force 5xx simulation — only for testing
     if event.get("queryStringParameters", {}).get("force_error") == "true":
         raise Exception("Simulated 5xx error for alarm test")
 
@@ -21,7 +22,10 @@ def lambda_handler(event, context):
     response = table.get_item(Key={'code': code})
 
     if 'Item' in response:
-        logger.info({"status": "found", "redirect_url": response['Item']['url']})
+        logger.info({
+            "status": "found",
+            "redirect_url": response['Item']['url']
+        })
         return {
             "statusCode": 302,
             "headers": {"Location": response['Item']['url']}
