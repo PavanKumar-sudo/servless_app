@@ -3,7 +3,7 @@
 import json
 import os
 import boto3
-from moto import mock_dynamodb  # ✅ Use this if mock_dynamodb2 doesn't exist
+from moto import mock_dynamodb  
 from create_link import lambda_handler
 
 

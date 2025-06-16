@@ -7,12 +7,12 @@ terraform {
   }
 
   required_version = ">= 1.0"
-  # backend "s3" {
-  #   bucket         = "serverless-project"
-  #   key            = "terraform/state"
-  #   region         = "us-west-2"
-  #   dynamodb_table = "terraform-locks"
-  # }
+  backend "s3" {
+    bucket         = "project-servless"
+    key            = "terraform/state"
+    region         = "us-east-1"
+    dynamodb_table = "terraform-locks"
+  }
 }
 
 provider "aws" {

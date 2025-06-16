@@ -36,3 +36,14 @@ module "apigateway" {
   create_lambda_name   = var.create_lambda_function_name
   redirect_lambda_name = var.redirect_lambda_function_name
 }
+
+module "cloudwatch_alert" {
+  source           = "./modules/cloudwatch_alert"
+  alert_email      = var.alert_email
+  api_gateway_name = var.api_gateway_name
+  api_stage        = "$default"
+  api_id           = module.apigateway.api_id
+
+  depends_on = [module.apigateway]
+}
+

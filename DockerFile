@@ -1,24 +1,27 @@
-
+# Stage 1: Build Python app
 FROM public.ecr.aws/lambda/python:3.8 AS builder
 
 WORKDIR /app
 
-ARG FUNCTION_FILE=create_link.py
+ARG FUNCTION_FILE
 COPY ${FUNCTION_FILE} .
-# COPY requirements.txt .  
+COPY requirements.txt .
 
-# # Install dependencies if any (skip if empty)
-# RUN if [ -s requirements.txt ]; then \
-#       pip install -r requirements.txt -t .; \
-#     fi
+# 🔧 Install zip
+RUN yum install -y zip
 
-# Stage 2: Create the zip file
+# Install Python dependencies if requirements.txt is not empty
+RUN if [ -s requirements.txt ]; then \
+  pip install -r requirements.txt -t .; \
+  fi
+
+ARG ZIP_NAME
+RUN zip -r ${ZIP_NAME} .
+
+# Stage 2: Minimal image to extract zip
 FROM alpine:3.17
 
-RUN apk add --no-cache zip
 WORKDIR /app
+COPY --from=builder /app/${ZIP_NAME} .
 
-COPY --from=builder /app /app
-
-ARG ZIP_NAME=create_link.zip
-RUN zip -r /${ZIP_NAME} .
+CMD ["sleep", "infinity"]

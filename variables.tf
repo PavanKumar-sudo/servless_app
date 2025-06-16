@@ -32,3 +32,9 @@ variable "lambda_exec_role_name" {
   type        = string
   description = "The IAM role name assigned to Lambda functions."
 }
+
+variable "alert_email" {
+  description = "Email to receive CloudWatch alerts"
+  type        = string
+}
+
