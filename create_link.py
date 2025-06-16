@@ -7,6 +7,7 @@ import uuid
 # Instantiate Powertools logger
 logger = Logger()
 
+
 @logger.inject_lambda_context
 def lambda_handler(event, context):
     table_name = os.environ['TABLE_NAME']
