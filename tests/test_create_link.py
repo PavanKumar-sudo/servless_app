@@ -3,11 +3,12 @@ import os
 import boto3
 from moto import mock_dynamodb
 from create_link import lambda_handler
-from tests.utils import MockLambdaContext  # ✅ Reused context
+from tests.utils import MockLambdaContext
 
 @mock_dynamodb
 def test_create_short_url():
     os.environ["TABLE_NAME"] = "short_urls"
+    os.environ["AWS_REGION"] = "us-east-1"
 
     dynamodb = boto3.resource("dynamodb", region_name="us-east-1")
     table = dynamodb.create_table(
