@@ -1,11 +1,14 @@
-# tests/test_create_link.py
-
 import json
 import os
 import boto3
-from moto import mock_dynamodb  
+from moto import mock_dynamodb
 from create_link import lambda_handler
 
+class MockContext:
+    function_name = "test-function"
+    memory_limit_in_mb = "128"
+    invoked_function_arn = "arn:aws:lambda:us-east-1:123456789012:function:test"
+    aws_request_id = "test-request-id"
 
 @mock_dynamodb
 def test_create_short_url():
@@ -25,7 +28,7 @@ def test_create_short_url():
         "headers": {"host": "mockapi.execute-api.local"}
     }
 
-    response = lambda_handler(event, None)
+    response = lambda_handler(event, MockContext())
     body = json.loads(response["body"])
 
     assert response["statusCode"] == 200

@@ -1,8 +1,13 @@
 import os
 import boto3
-import pytest
 from moto import mock_dynamodb
 from redirect import lambda_handler
+
+class MockContext:
+    function_name = "test-function"
+    memory_limit_in_mb = "128"
+    invoked_function_arn = "arn:aws:lambda:us-east-1:123456789012:function:test"
+    aws_request_id = "test-request-id"
 
 @mock_dynamodb
 def test_redirect_handler_found():
@@ -21,11 +26,10 @@ def test_redirect_handler_found():
         'pathParameters': {'code': 'abc123'}
     }
 
-    response = lambda_handler(event, None)
+    response = lambda_handler(event, MockContext())
 
     assert response['statusCode'] == 302
     assert response['headers']['Location'] == 'https://example.com'
-
 
 @mock_dynamodb
 def test_redirect_handler_not_found():
@@ -43,7 +47,7 @@ def test_redirect_handler_not_found():
         'pathParameters': {'code': 'xyz999'}
     }
 
-    response = lambda_handler(event, None)
+    response = lambda_handler(event, MockContext())
 
     assert response['statusCode'] == 404
     assert response['body'] == "Not found"
