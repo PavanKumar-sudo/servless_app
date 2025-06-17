@@ -166,7 +166,9 @@ jobs:
       - name: Simulate 5xx Errors to Trigger Alarm
         run: |
           for i in {1..20}; do
-            curl -s -o /dev/null -w "%{http_code}\n" "${{ needs.deploy.outputs.api_url }}/fakepath?force_error=true"
+            curl -s -o /dev/null -w "%{http_code}\n" "${{ needs.deploy.outputs.api_url }}/shorten?force_error=true" \
+               -H "Content-Type: application/json" \
+               -d '{"url": "https://example.com"}'
           done
 
       - name: Send Email on Failure

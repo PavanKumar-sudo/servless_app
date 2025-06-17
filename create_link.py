@@ -14,9 +14,11 @@ def lambda_handler(event, context):
     table = boto3.resource('dynamodb', region_name=region).Table(table_name)
 
     try:
+        # ✅ Move force error check to the top
         if event.get("queryStringParameters", {}).get("force_error") == "true":
-            raise Exception("Forced error for 5xx simulation")
+            raise RuntimeError("Forced error for 5xx simulation")
 
+        # ✅ This part should only run if not forcing error
         body = json.loads(event.get('body', '{}'))
         long_url = body.get('url')
 
@@ -43,8 +45,17 @@ def lambda_handler(event, context):
             "body": json.dumps({"short_url": short_url})
         }
 
+    except RuntimeError as re:
+        logger.error(f"Forced error: {re}")
+        return {
+            "statusCode": 500,
+            "body": json.dumps({
+                "error": "Internal Server Error"
+            })
+        }
+
     except Exception as e:
-        logger.error(f"Error processing request: {e}")
+        logger.error(f"Unexpected error: {e}")
         return {
             "statusCode": 500,
             "body": json.dumps({
