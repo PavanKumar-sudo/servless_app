@@ -36,7 +36,6 @@ jobs:
         run: |
           . venv/bin/activate
           PYTHONPATH=. pytest tests/
-
   sonarqube-scan:
     name: SonarQube Quality Scan
     runs-on: ubuntu-latest
@@ -64,20 +63,20 @@ jobs:
           coverage run -m pytest
           coverage xml
 
-      - name: Download and Install SonarScanner CLI
+      - name: Show Coverage %
+        run: |
+          . venv/bin/activate
+          coverage report
+
+      - name: Run SonarQube Scanner
+        continue-on-error: false
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           curl -sSLo sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip
           unzip sonar-scanner.zip
           mv sonar-scanner-5.0.1.3006-linux $HOME/sonar-scanner
-          echo "$HOME/sonar-scanner/bin" >> $GITHUB_PATH
-
-      - name: Verify SonarScanner Installation
-        run: which sonar-scanner
-
-      - name: Run SonarQube Scanner
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: |
+          export PATH="$HOME/sonar-scanner/bin:$PATH"
           sonar-scanner \
             -Dsonar.projectKey=serverless \
             -Dsonar.sources=. \
@@ -88,6 +87,8 @@ jobs:
             -Dsonar.python.coverage.reportPaths=coverage.xml \
             -Dsonar.qualitygate.wait=true
 
+
+  
   build-lambda:
     name: Build Lambda Artifacts
     runs-on: ubuntu-latest
