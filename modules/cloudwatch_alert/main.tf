@@ -22,8 +22,8 @@ resource "aws_cloudwatch_metric_alarm" "api_5xx_errors" {
 
   dimensions = {
     ApiId    = var.api_id
-    Method   = "GET"
-    Resource = "/{code}"
+    Method   = "POST"
+    Resource = "/shorten"
     Stage    = var.api_stage
   }
 }

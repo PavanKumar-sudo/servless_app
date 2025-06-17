@@ -11,7 +11,6 @@ variable "api_gateway_name" {
 variable "api_stage" {
   description = "Stage name of the API Gateway"
   type        = string
-  default     = "$default"
 }
 
 variable "api_id" {

@@ -41,7 +41,7 @@ module "cloudwatch_alert" {
   source           = "./modules/cloudwatch_alert"
   alert_email      = var.alert_email
   api_gateway_name = var.api_gateway_name
-  api_stage        = "$default"
+  api_stage        = module.apigateway.stage_name
   api_id           = module.apigateway.api_id
 
   depends_on = [module.apigateway]
