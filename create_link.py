@@ -1,49 +1,50 @@
+from aws_lambda_powertools import Logger
 import os
-import json
 import boto3
-import pytest
-from moto import mock_dynamodb
-from lambda_function import lambda_handler  # adjust if your file name is different
+import json
+import uuid
 
-TABLE_NAME = "UrlTable"
-
-
-@pytest.fixture
-def dynamodb_mock():
-    with mock_dynamodb():
-        os.environ['TABLE_NAME'] = TABLE_NAME
-        os.environ['AWS_REGION'] = 'us-east-1'
-
-        dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
-        table = dynamodb.create_table(
-            TableName=TABLE_NAME,
-            KeySchema=[{'AttributeName': 'code', 'KeyType': 'HASH'}],
-            AttributeDefinitions=[{'AttributeName': 'code', 'AttributeType': 'S'}],
-            BillingMode='PAY_PER_REQUEST'
-        )
-        table.meta.client.get_waiter('table_exists').wait(TableName=TABLE_NAME)
-        yield
+logger = Logger()
 
 
-def test_lambda_handler_success(dynamodb_mock):
-    event = {
-        "headers": {"host": "example.com"},
-        "body": json.dumps({"url": "https://openai.com"})
-    }
-    response = lambda_handler(event, None)
-    body = json.loads(response['body'])
+@logger.inject_lambda_context
+def lambda_handler(event, context):
+    table_name = os.environ['TABLE_NAME']
+    region = os.environ.get('AWS_REGION', 'us-east-1')
+    table = boto3.resource('dynamodb', region_name=region).Table(table_name)
 
-    assert response['statusCode'] == 200
-    assert 'short_url' in body
-    assert body['short_url'].startswith("https://example.com/")
+    try:
+        body = json.loads(event.get('body', '{}'))
+        long_url = body.get('url')
 
+        if not long_url:
+            return {
+                "statusCode": 400,
+                "body": json.dumps({
+                    "error": "Missing 'url' in request body"
+                })
+            }
 
-def test_lambda_handler_missing_url(dynamodb_mock):
-    event = {
-        "headers": {"host": "example.com"},
-        "body": json.dumps({})
-    }
-    response = lambda_handler(event, None)
+        code = str(uuid.uuid4())[:6].lower()
+        logger.info({
+            "action": "put_item",
+            "code": code,
+            "url": long_url
+        })
 
-    assert response['statusCode'] == 400
-    assert json.loads(response['body'])['error'] == "Missing 'url' in request body"
+        table.put_item(Item={'code': code, 'url': long_url})
+
+        short_url = f"https://{event['headers']['host']}/{code}"
+        return {
+            "statusCode": 200,
+            "body": json.dumps({"short_url": short_url})
+        }
+
+    except Exception as e:
+        logger.error(f"Error processing request: {e}")
+        return {
+            "statusCode": 500,
+            "body": json.dumps({
+                "error": "Internal Server Error"
+            })
+        }
