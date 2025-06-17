@@ -82,7 +82,9 @@ jobs:
             -Dsonar.projectKey=serverless \
             -Dsonar.sources=. \
             -Dsonar.host.url=http://34.201.20.14:9000 \
-            -Dsonar.login=$SONAR_TOKEN \
+            -Dsonar.token=$SONAR_TOKEN \
+            -Dsonar.python.version=3.12 \
+            -Dsonar.sourceEncoding=UTF-8 \
             -Dsonar.python.coverage.reportPaths=coverage.xml \
             -Dsonar.qualitygate.wait=true
 
@@ -167,8 +169,8 @@ jobs:
         run: |
           for i in {1..20}; do
             curl -s -o /dev/null -w "%{http_code}\n" "${{ needs.deploy.outputs.api_url }}/shorten?force_error=true" \
-               -H "Content-Type: application/json" \
-               -d '{"url": "https://example.com"}'
+              -H "Content-Type: application/json" \
+              -d '{"url": "https://example.com"}'
           done
 
       - name: Send Email on Failure
