@@ -64,21 +64,25 @@ jobs:
           coverage run -m pytest
           coverage xml
 
-      - name: Download and Install SonarScanner
+      - name: Download and Install SonarScanner CLI
         run: |
           curl -sSLo sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip
           unzip sonar-scanner.zip
-          sudo mv sonar-scanner-*/bin/* /usr/local/bin/
+          mv sonar-scanner-5.0.1.3006-linux $HOME/sonar-scanner
+          echo "$HOME/sonar-scanner/bin" >> $GITHUB_PATH
+
+      - name: Verify SonarScanner Installation
+        run: which sonar-scanner
 
       - name: Run SonarQube Scanner
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           sonar-scanner \
-            -Dsonar.projectKey=${{ vars.SONAR_PROJECT_KEY }} \
+            -Dsonar.projectKey=serverless \
             -Dsonar.sources=. \
-            -Dsonar.host.url=${{ vars.SONAR_HOST_URL }} \
-            -Dsonar.token=$SONAR_TOKEN \
+            -Dsonar.host.url=http://13.220.246.72:9000 \
+            -Dsonar.login=$SONAR_TOKEN \
             -Dsonar.python.coverage.reportPaths=coverage.xml \
             -Dsonar.qualitygate.wait=true
 
