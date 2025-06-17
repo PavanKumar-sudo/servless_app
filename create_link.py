@@ -6,6 +6,7 @@ import uuid
 
 logger = Logger()
 
+
 @logger.inject_lambda_context
 def lambda_handler(event, context):
     table_name = os.environ['TABLE_NAME']
@@ -13,7 +14,6 @@ def lambda_handler(event, context):
     table = boto3.resource('dynamodb', region_name=region).Table(table_name)
 
     try:
-        
         if event.get("queryStringParameters", {}).get("force_error") == "true":
             raise Exception("Forced error for 5xx simulation")
 
