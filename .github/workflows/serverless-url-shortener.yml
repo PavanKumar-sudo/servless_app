@@ -78,7 +78,7 @@ jobs:
           mv sonar-scanner-5.0.1.3006-linux $HOME/sonar-scanner
           export PATH="$HOME/sonar-scanner/bin:$PATH"
           sonar-scanner \
-            -Dsonar.projectKey=serverless \
+            -Dsonar.projectKey=Serverless \
             -Dsonar.sources=. \
             -Dsonar.host.url=http://44.205.22.100:9000 \
             -Dsonar.token=$SONAR_TOKEN \
